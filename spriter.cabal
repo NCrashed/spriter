@@ -18,11 +18,13 @@ executable spriter
   other-modules:
     Spriter.Camera 
     Spriter.Math
+    Spriter.Voxel
   ghc-options:         -O2 -funbox-strict-fields
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
                      , JuicyPixels >= 3.2.7
                      , deepseq >= 1.4.1.1
+                     , vector >= 0.11.0.0
   default-extensions: 
     DeriveGeneric
     RecordWildCards

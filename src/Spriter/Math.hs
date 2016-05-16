@@ -6,9 +6,13 @@ module Spriter.Math(
   , normalize
   , Plane(..)
   , Ray(..)
+  , restartRay
+  , rebaseRay
+  , rescaleRay
   , Box(..)
   , infinity
   , rayBoxIntersect
+  , lerp
   ) where 
 
 import GHC.Generics 
@@ -90,3 +94,27 @@ rayBoxIntersect Ray{..} Box{..} = if tmaxz >= tminz then Just tminz else Nothing
   tz2 = (bmaxz - roz) / rdz 
   tminz = if rdz == 0 then tminy else max tminy $ min tz1 tz2 
   tmaxz = if rdz == 0 then tmaxy else min tmaxy $ max tz1 tz2 
+
+lerp :: Float -- ^ Start y
+ -> Float -- ^ End y
+ -> Float -- ^ Current x
+ -> Float -- ^ Current y
+lerp y0 y1 x = y0 + (y1-y0)*x
+
+-- | Moves origin along ray direction by given value
+restartRay :: Float -> Ray -> Ray 
+restartRay d r = r {
+    rayOrigin = rayOrigin r + rayDirection r `scale` d 
+  }
+
+-- | Rebase ray origin relative to given point
+rebaseRay :: Vec3 -> Ray -> Ray 
+rebaseRay v r = r {
+    rayOrigin = rayOrigin r - v
+  }
+
+-- | Changes scale of ray step
+rescaleRay :: Vec3 -> Ray -> Ray 
+rescaleRay v r = r {
+    rayDirection = rayDirection r * v 
+  }
