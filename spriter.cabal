@@ -1,0 +1,28 @@
+name:                spriter
+version:             0.1.0.0
+synopsis:            Simple project template from stack
+description:         Please see README.md
+homepage:            https://github.com/ncrashed/spriter#readme
+license:             BSD3
+license-file:        LICENSE
+author:              NCrashed
+maintainer:          ncrashed@gmail.com
+copyright:           2016 Anton Gushcha
+category:            Web
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable spriter
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  other-modules:
+    Spriter.Camera 
+    Spriter.Math
+  ghc-options:         -O2 -funbox-strict-fields
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5
+                     , JuicyPixels >= 3.2.7
+                     , deepseq >= 1.4.1.1
+  default-extensions: 
+    DeriveGeneric
+    RecordWildCards

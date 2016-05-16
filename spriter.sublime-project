@@ -1,0 +1,16 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+  "build_systems":
+  [
+    {
+      "name": "Stack",
+      "working_dir": "${project_path}",
+      "shell_cmd": "stack install && spriter && subl sprite.png"    
+    }
+  ]
+}
