@@ -25,6 +25,7 @@ executable spriter
                      , JuicyPixels >= 3.2.7
                      , deepseq >= 1.4.1.1
                      , vector >= 0.11.0.0
+                     , lens >= 4.13
   default-extensions: 
     DeriveGeneric
     RecordWildCards

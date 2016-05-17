@@ -6,6 +6,7 @@ module Spriter.Voxel(
   , VoxelModel(..)
   , traverseModel
   , gridFromLayersXZ
+  , gridFromImagesXZ
   ) where 
 
 import GHC.Generics 
@@ -14,6 +15,7 @@ import Data.Word
 import Codec.Picture 
 import Data.Bits 
 import Data.List 
+import Control.Lens 
 
 import qualified Data.Vector.Unboxed as VU 
 
@@ -195,3 +197,14 @@ gridFromLayersXZ layers = foldl' addLayer (emptyGrid maxx maxy maxx) $ layers `z
   addLayer acc (layer, y) = foldl' (addRow y) acc $ layer `zip` [0..]
   addRow y acc (row, z) = foldl' (addVoxel y z) acc $ row `zip` [0..]
   addVoxel y z acc (c, x) = setVoxel x y z c acc
+
+-- | Fill voxel layer from XZ layers
+gridFromImagesXZ :: [Image PixelRGBA8] -> VoxelGrid
+gridFromImagesXZ layers = foldl' addLayer (emptyGrid maxx maxy maxx) $ layers `zip` [0..]
+  where 
+  maxz = length layers
+  maxy = maximum $ imageHeight <$> layers
+  maxx = maximum $ imageWidth <$> layers
+
+  addLayer acc (layer, y) = fst $ mapAccumLOf imageIPixels (addVoxel y) acc layer 
+  addVoxel y acc (x, z, c) = (setVoxel x y z c acc, c)
