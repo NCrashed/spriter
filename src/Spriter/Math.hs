@@ -113,8 +113,8 @@ rebaseRay v r = r {
     rayOrigin = rayOrigin r - v
   }
 
--- | Changes scale of ray step
+-- | Changes scale of ray origin
 rescaleRay :: Vec3 -> Ray -> Ray 
-rescaleRay v r = r {
-    rayDirection = rayDirection r * v 
+rescaleRay (Vec3 x y z) r = r {
+    rayOrigin = rayOrigin r * Vec3 (1/x) (1/y) (1/z)
   }

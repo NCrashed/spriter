@@ -56,4 +56,4 @@ screenRayPersp c w h x y fov = Ray{..}
   fovx = cameraLeft c `scale` sin (x' * fov)
   fovy = cameraUp c `scale` sin (y' * fov)
   rayOrigin = cameraEye c + offsetx + offsety
-  rayDirection = cameraForward c + fovx + fovy
+  rayDirection = normalize $ cameraForward c + fovx + fovy
