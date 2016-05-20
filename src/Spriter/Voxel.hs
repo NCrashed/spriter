@@ -94,11 +94,11 @@ getVoxel x y z g = if inGridRange x y z g
   where
     i = toIndex x y z g 
 
--- | Go withing 3d grid of voxels and return first the ray hit
-traverseGrid :: Ray -> VoxelGrid -> Maybe PixelRGBA8
+-- | Go withing 3d grid of voxels and return first the ray hit with color and surface normal
+traverseGrid :: Ray -> VoxelGrid -> Maybe (PixelRGBA8, Vec3)
 traverseGrid Ray{..} grid@VoxelGrid{..} = if not (inGridRange x0 y0 z0 grid) || c0 == ec 
     then go x0 y0 z0 mx0 my0 mz0 
-    else Just c0
+    else Just (c0, n0)
   where 
   (Vec3 x0' y0' z0') = rayOrigin
   (Vec3 dx' dy' dz') = rayDirection
@@ -107,6 +107,16 @@ traverseGrid Ray{..} grid@VoxelGrid{..} = if not (inGridRange x0 y0 z0 grid) || 
   y0 = floor (y0' / wy)
   z0 = floor (z0' / wz)
   c0 = getVoxel x0 y0 z0 grid
+
+  dx0' = abs $ x0' - fromIntegral x0
+  dy0' = abs $ y0' - fromIntegral y0
+  dz0' = abs $ z0' - fromIntegral z0
+
+  n0 = if dx0' < dy0'
+    then if dx0' < dz0' then Vec3 (negate $ fromIntegral stepx) 0 0
+         else Vec3 0 0 (negate $ fromIntegral stepz)
+    else if dy0' < dz0' then Vec3 0 (negate $ fromIntegral stepy) 0
+         else Vec3 0 0 (negate $ fromIntegral stepz)
 
   stepx, stepy, stepz :: Int
   stepx = floor $ signum dx'
@@ -144,19 +154,19 @@ traverseGrid Ray{..} grid@VoxelGrid{..} = if not (inGridRange x0 y0 z0 grid) || 
       c = getVoxel x' y z grid
       in if x' == outx then Nothing 
          else if c == ec then go x' y z (mx + dx) my mz 
-              else Just c
+              else Just (c, Vec3 (fromIntegral (negate $ fromIntegral stepx)) 0 0)
     ycase = let 
       y' = y + stepy 
       c = getVoxel x y' z grid
       in if y' == outy then Nothing 
          else if c == ec then go x y' z mx (my + dy) mz
-              else Just c
+              else Just (c, Vec3 0 (fromIntegral (negate $ fromIntegral stepy)) 0)
     zcase = let 
       z' = z + stepz
       c = getVoxel x y z' grid 
       in if z' == outz then Nothing 
          else if c == ec then go x y z' mx my (mz + dz)
-              else Just c
+              else Just (c, Vec3 0 0 (fromIntegral (negate $ fromIntegral stepz)))
 
 data VoxelModel = VoxelModel {
   voxModelGrid :: !VoxelGrid
@@ -176,7 +186,7 @@ voxelModelBox VoxelModel{..} = Box {
   Vec3 sx sy sz = voxModelScale
 
 -- | Get color at intersection of ray and model
-traverseModel :: Ray -> VoxelModel -> Maybe PixelRGBA8
+traverseModel :: Ray -> VoxelModel -> Maybe (PixelRGBA8, Vec3)
 traverseModel r m@VoxelModel{..} = case r `rayBoxIntersect` voxelModelBox m of 
   Nothing -> Nothing
   Just d -> traverseGrid r' voxModelGrid

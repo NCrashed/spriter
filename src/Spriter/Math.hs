@@ -4,6 +4,8 @@ module Spriter.Math(
   , scale 
   , norm 
   , normalize
+  , angleCos
+  , dot
   , Plane(..)
   , Ray(..)
   , restartRay
@@ -34,10 +36,16 @@ scale :: Vec3 -> Float -> Vec3
 scale (Vec3 x y z) a = Vec3 (x*a) (y*a) (z*a)
 
 norm :: Vec3 -> Float 
-norm (Vec3 x y z) = sqrt $ x*x + y*y + z*z
+norm v = sqrt $ v `dot` v
 
 normalize :: Vec3 -> Vec3 
 normalize v = v `scale` (1 / norm v)
+
+dot :: Vec3 -> Vec3 -> Float 
+dot (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
+
+angleCos :: Vec3 -> Vec3 -> Float 
+angleCos v1 v2 = v1 `dot` v2 / (norm v1 * norm v2)
 
 instance Num Vec3 where 
   (Vec3 x1 y1 z1) + (Vec3 x2 y2 z2) = Vec3 (x1 + x2) (y1 + y2) (z1 + z2)

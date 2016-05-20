@@ -10,7 +10,7 @@ import Spriter.Voxel
 
 testCamera :: Camera 
 testCamera = Camera {
-  cameraEye = Vec3 0.5 (-0.2) 0.5
+  cameraEye = Vec3 0.6 (-0.2) 0.6
 , cameraForward = normalize $ Vec3 0.5 (-1) 0
 , cameraUp = Vec3 0 0 1
 }
@@ -29,14 +29,19 @@ renderSpriteToFile path = do
   scene <- testScene 7
   writePng path $ generateImage (renderSprite scene) width height
   where 
-  width = 255
-  height = 255
+  width = 800
+  height = 800
   fov = pi / 3
-  renderSprite scene x y = case r `traverseModel` scene of 
+  renderSprite scene x y = case ray `traverseModel` scene of 
     Nothing -> PixelRGB8 0 0 0
-    Just (PixelRGBA8 r g b _) -> PixelRGB8 r g b
+    Just (PixelRGBA8 r g b _, n) -> PixelRGB8 (round $ r' * c) (round $ g' * c) (round $ b' * c)
+      where 
+        r' = fromIntegral r 
+        g' = fromIntegral g 
+        b' = fromIntegral b
+        c = negate (rayDirection ray) `angleCos` n 
     where
-    r = screenRayPersp testCamera width height x y fov
+    ray = screenRayPersp testCamera width height x y fov
 
 main :: IO ()
 main = renderSpriteToFile "sprite.png"
